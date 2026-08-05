@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Krishi Advisor — Precision Indian Agriculture & Live Weather</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- Sidebar Navigation -->
+  <aside class="app-sidebar">
+    <div class="brand-logo">
+      <div class="brand-icon">🌱</div>
+      <div class="brand-text">
+        <h1>AI Krishi Advisor</h1>
+        <span>Indian Agronomy AI</span>
+      </div>
+    </div>
+
+    <nav class="nav-menu">
+      <a class="nav-item active" data-tab="dashboard">
+        <i data-lucide="layout-dashboard"></i>
+        <span>Dashboard</span>
+      </a>
+      <a class="nav-item" data-tab="weather">
+        <i data-lucide="cloud-sun"></i>
+        <span>Live Weather</span>
+      </a>
+      <a class="nav-item" data-tab="crops">
+        <i data-lucide="sprout"></i>
+        <span>Crop Recommender</span>
+      </a>
+      <a class="nav-item" data-tab="fertilizer">
+        <i data-lucide="flask-conical"></i>
+        <span>Fertilizer Tool</span>
+      </a>
+      <a class="nav-item" data-tab="irrigation">
+        <i data-lucide="droplets"></i>
+        <span>Irrigation Planner</span>
+      </a>
+      <a class="nav-item" data-tab="disease">
+        <i data-lucide="scan-line"></i>
+        <span>Disease AI</span>
+      </a>
+      <a class="nav-item" data-tab="chat">
+        <i data-lucide="bot"></i>
+        <span>AI Krishi Assistant</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-profile">
+      <div class="profile-info">
+        <h4 id="sidebar-farm-name">Kisan Vikas Agro Farm</h4>
+        <p id="sidebar-location">Ludhiana, Punjab</p>
+      </div>
+      <button class="btn-edit-profile" id="btn-open-modal" title="Edit Farm Profile">
+        <i data-lucide="settings"></i>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content Area -->
+  <main class="app-main">
+    
+    <!-- Top Header -->
+    <header class="top-header">
+      <div class="header-title">
+        <h2 id="header-view-title">Indian Agricultural Intelligence Dashboard</h2>
+        <p id="header-view-subtitle">Live weather forecasts, soil analytics, and crop advisory.</p>
+      </div>
+
+      <div class="header-actions">
+        <div class="location-pill">
+          <i data-lucide="map-pin"></i>
+          <span id="header-location-tag">Ludhiana, Punjab</span>
+        </div>
+        <button class="btn-secondary" id="btn-auto-gps" title="Connect Live GPS Weather">
+          <i data-lucide="navigation"></i> Live GPS
+        </button>
+        <button class="btn-primary" id="btn-quick-scan">
+          <i data-lucide="camera"></i> Leaf Scan AI
+        </button>
+      </div>
+    </header>
+
+    <!-- TAB 1: DASHBOARD VIEW -->
+    <section class="tab-content active" id="tab-dashboard">
+      
+      <!-- Key Metrics Row -->
+      <div class="grid-cols-4">
+        <div class="glass-card metric-card">
+          <div class="metric-data">
+            <span>Soil Health Index</span>
+            <h3 id="dash-soil-score">88 / 100</h3>
+            <div class="metric-sub" id="dash-soil-text">pH 6.8 • Alluvial Soil</div>
+          </div>
+          <div class="metric-icon emerald">🌱</div>
+        </div>
+
+        <div class="glass-card metric-card">
+          <div class="metric-data">
+            <span>Live Temperature</span>
+            <h3 id="dash-temp">32°C</h3>
+            <div class="metric-sub" id="dash-weather-text">Monsoon Rain • 76% Humidity</div>
+          </div>
+          <div class="metric-icon sky">🌦️</div>
+        </div>
+
+        <div class="glass-card metric-card">
+          <div class="metric-data">
+            <span>Water Demand (ETc)</span>
+            <h3 id="dash-water">4.5 mm/day</h3>
+            <div class="metric-sub" id="dash-water-text">Drip Irrigation • 2.2k L/acre</div>
+          </div>
+          <div class="metric-icon amber">💧</div>
+        </div>
+
+        <div class="glass-card metric-card">
+          <div class="metric-data">
+            <span>Top Match Crop</span>
+            <h3 id="dash-top-crop">Wheat</h3>
+            <div class="metric-sub" id="dash-crop-score">96% Soil Match (Optimal)</div>
+          </div>
+          <div class="metric-icon rose">🌾</div>
+        </div>
+      </div>
+
+      <!-- Main Dashboard Grid -->
+      <div class="grid-cols-3">
+        <!-- Weather Overview Widget -->
+        <div class="glass-card" style="grid-column: span 2;">
+          <div class="card-header">
+            <div class="card-title">
+              <i data-lucide="cloud-rain"></i>
+              <h3>7-Day Live Agricultural Forecast & Evapotranspiration</h3>
+            </div>
+            <button class="btn-secondary" id="btn-refresh-weather">
+              <i data-lucide="rotate-cw"></i> Refresh
+            </button>
+          </div>
+          
+          <div id="dash-weather-strip" class="weather-strip"></div>
+
+          <div style="margin-top: 1.5rem; height: 200px;">
+            <canvas id="chart-et0-rain"></canvas>
+          </div>
+        </div>
+
+        <!-- Quick Advisory & Farm Profile Card -->
+        <div class="glass-card">
+          <div class="card-header">
+            <div class="card-title">
+              <i data-lucide="bell"></i>
+              <h3>Krishi Advisory Alerts</h3>
+            </div>
+          </div>
+          
+          <div id="dash-advisory-list" style="display: flex; flex-direction: column; gap: 0.9rem;"></div>
+
+          <div style="margin-top: 1.5rem; border-top: 1px solid var(--glass-border); padding-top: 1rem;">
+            <button class="btn-primary" style="width: 100%; justify-content: center;" id="btn-dash-open-chat">
+              <i data-lucide="bot"></i> Ask AI Krishi Advisor
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Soil Test & Top Recommendations Row -->
+      <div class="grid-cols-2">
+        <div class="glass-card">
+          <div class="card-header">
+            <div class="card-title">
+              <i data-lucide="test-tube"></i>
+              <h3>Active Soil NPK & pH Profile</h3>
+            </div>
+            <button class="btn-secondary" id="btn-edit-soil-dash">Edit Soil Test</button>
+          </div>
+          <div style="height: 220px; display: flex; align-items: center; justify-content: center;">
+            <canvas id="chart-soil-npk"></canvas>
+          </div>
+        </div>
+
+        <div class="glass-card">
+          <div class="card-header">
+            <div class="card-title">
+              <i data-lucide="award"></i>
+              <h3>Top Suitable Crops for Indian Market</h3>
+            </div>
+          </div>
+          <div id="dash-top-crops-list" style="display: flex; flex-direction: column; gap: 0.8rem;"></div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- TAB 2: LIVE WEATHER VIEW -->
+    <section class="tab-content" id="tab-weather" style="display: none;">
+      <div class="glass-card" style="margin-bottom: 1.5rem;">
+        <div class="card-header">
+          <div class="card-title">
+            <i data-lucide="search"></i>
+            <h3>Indian Weather Station & District Search</h3>
+          </div>
+        </div>
+        <div style="display: flex; gap: 1rem;">
+          <input type="text" id="weather-search-input" placeholder="Search Indian city or district (e.g., Ludhiana, Karnal, Lucknow, Pune, Nagpur)..." class="form-control">
+          <button class="btn-primary" id="btn-search-weather">Search Location</button>
+        </div>
+        <div id="weather-search-results" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.75rem;"></div>
+      </div>
+
+      <div class="grid-cols-3">
+        <div class="glass-card" style="grid-column: span 2;">
+          <div class="card-header">
+            <div class="card-title">
+              <i data-lucide="calendar"></i>
+              <h3>7-Day Agricultural Forecast</h3>
+            </div>
+          </div>
+          <div id="weather-view-strip" class="weather-strip"></div>
+        </div>
+
+        <div class="glass-card">
+          <div class="card-header">
+            <div class="card-title">
+              <i data-lucide="shield-alert"></i>
+              <h3>Agricultural Advisories</h3>
+            </div>
+          </div>
+          <div id="weather-advisories-full" style="display: flex; flex-direction: column; gap: 1rem;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: CROP RECOMMENDER VIEW -->
+    <section class="tab-content" id="tab-crops" style="display: none;">
+      <div class="grid-cols-3">
+        <div class="glass-card">
+          <div class="card-header">
+            <div class="card-title">
+              <i data-lucide="sliders"></i>
+              <h3>Soil & Seasonal Parameters</h3>
+            </div>
+          </div>
+
+          <form id="form-crop-recommendation">
+            <div class="form-group">
+              <label>Nitrogen (N - mg/kg): <span id="val-n">90</span></label>
+              <input type="range" id="input-n" min="10" max="200" value="90" class="range-slider">
+            </div>
+
+            <div class="form-group">
+              <label>Phosphorus (P - mg/kg): <span id="val-p">45</span></label>
+              <input type="range" id="input-p" min="10" max="150" value="45" class="range-slider">
+            </div>
+
+            <div class="form-group">
+              <label>Potassium (K - mg/kg): <span id="val-k">55</span></label>
+              <input type="range" id="input-k" min="10" max="250" value="55" class="range-slider">
+            </div>
+
+            <div class="form-group">
+              <label>Soil pH: <span id="val-ph">6.8</span></label>
+              <input type="range" id="input-ph" min="4.0" max="9.0" step="0.1" value="6.8" class="range-slider">
+            </div>
+
+            <div class="form-group">
+              <label>Indian Soil Type</label>
+              <select id="input-soil-type">
+                <option value="Alluvial">Alluvial Soil (Indo-Gangetic)</option>
+                <option value="Black Cotton">Black Cotton Soil (Regur)</option>
+                <option value="Red Soil">Red & Yellow Soil</option>
+                <option value="Laterite">Laterite Soil</option>
+                <option value="Sandy Loam">Sandy Loam</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Crop Season</label>
+              <select id="input-season">
+                <option value="Kharif">Kharif (Monsoon / Summer)</option>
+                <option value="Rabi">Rabi (Winter / Spring)</option>
+                <option value="Zaid">Zaid (Summer)</option>
+              </select>
+            </div>
+
+            <button type="button" class="btn-primary" id="btn-run-crop-engine" style="width: 100%; justify-content: center; margin-top: 1rem;">
+              <i data-lucide="sparkles"></i> Calculate Crop Matches
+            </button>
+          </form>
+        </div>
+
+        <div style="grid-column: span 2;">
+          <div class="card-header" style="margin-bottom: 1rem;">
+            <h3 style="font-size: 1.2rem; font-weight: 700; color: #fff;">Recommended Crops & Market Rates</h3>
+          </div>
+
+          <div id="crop-results-container" class="crop-cards-grid"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: FERTILIZER CALCULATOR VIEW -->
+    <section class="tab-content" id="tab-fertilizer" style="display: none;">
+      <div class="grid-cols-3">
+        <div class="glass-card">
+          <div class="card-header">
+            <div class="card-title">
+              <i data-lucide="calculator"></i>
+              <h3>Fertilizer Dosage Calculator</h3>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Target Crop</label>
+            <select id="fert-crop-select">
+              <option value="wheat">Wheat (Gehun)</option>
+              <option value="paddy_rice">Paddy Rice (Dhan)</option>
+              <option value="cotton">Cotton (Kapas)</option>
+              <option value="mustard">Mustard (Sarson)</option>
+              <option value="chickpea">Chickpea (Chana)</option>
+              <option value="sugarcane">Sugarcane (Ganna)</option>
+              <option value="bajra">Pearl Millet (Bajra)</option>
+              <option value="tomato">Tomato (Tamatar)</option>
+              <option value="onion">Onion (Pyaz)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Field Area & Unit</label>
+            <div style="display: flex; gap: 0.5rem;">
+              <input type="number" id="fert-area" value="5" min="0.1" step="0.5" class="form-control">
+              <select id="fert-unit" style="width: 130px;">
+                <option value="acre">Acres</option>
+                <option value="bigha">Bigha</option>
+                <option value="guntha">Guntha</option>
+                <option value="hectare">Hectares</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Current Soil Test (N - P - K kg/ha)</label>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem;">
+              <input type="number" id="fert-current-n" value="60" placeholder="N" class="form-control">
+              <input type="number" id="fert-current-p" value="30" placeholder="P" class="form-control">
+              <input type="number" id="fert-current-k" value="30" placeholder="K" class="form-control">
+            </div>
+          </div>
+
+          <button class="btn-primary" id="btn-calc-fert" style="width: 100%; justify-content: center; margin-top: 1rem;">
+            <i data-lucide="flask-conical"></i> Calculate Neem Urea & DAP
+          </button>
+        </div>
+
+        <div style="grid-column: span 2;" id="fert-results-view"></div>
+      </div>
+    </section>
+
+    <!-- TAB 5: IRRIGATION PLANNER VIEW -->
+    <section class="tab-content" id="tab-irrigation" style="display: none;">
+      <div class="grid-cols-3">
+        <div class="glass-card">
+          <div class="card-header">
+            <div class="card-title">
+              <i data-lucide="settings-2"></i>
+              <h3>Irrigation Settings</h3>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Active Crop</label>
+            <select id="irrig-crop-select">
+              <option value="wheat">Wheat (Gehun)</option>
+              <option value="paddy_rice">Paddy Rice (Dhan)</option>
+              <option value="cotton">Cotton (Kapas)</option>
+              <option value="mustard">Mustard (Sarson)</option>
+              <option value="sugarcane">Sugarcane (Ganna)</option>
+              <option value="tomato">Tomato (Tamatar)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Growth Stage</label>
+            <select id="irrig-stage-select">
+              <option value="mid">Mid-Season / Flowering (Peak Demand)</option>
+              <option value="dev">Vegetative Development</option>
+              <option value="initial">Initial / Seedling</option>
+              <option value="late">Late-Season / Ripening</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Irrigation System Type</label>
+            <select id="irrig-system-select">
+              <option value="drip">Drip Irrigation (90% Efficiency)</option>
+              <option value="sprinkler">Micro-Sprinkler (75% Efficiency)</option>
+              <option value="furrow">Surface / Canal Furrow (60% Efficiency)</option>
+            </select>
+          </div>
+
+          <button class="btn-primary" id="btn-calc-irrig" style="width: 100%; justify-content: center; margin-top: 1rem;">
+            <i data-lucide="droplets"></i> Generate Water Schedule
+          </button>
+        </div>
+
+        <div style="grid-column: span 2;" id="irrig-results-view"></div>
+      </div>
+    </section>
+
+    <!-- TAB 6: DISEASE AI VIEW -->
+    <section class="tab-content" id="tab-disease" style="display: none;">
+      <div class="grid-cols-2">
+        <div class="glass-card">
+          <div class="card-header">
+            <div class="card-title">
+              <i data-lucide="camera"></i>
+              <h3>Leaf Photo Scanner AI</h3>
+            </div>
+          </div>
+
+          <div class="dropzone" id="disease-dropzone">
+            <div class="dropzone-icon">🍃</div>
+            <h4 style="color: #fff; font-size: 1.1rem; margin-bottom: 0.4rem;">Drop Leaf Photo Here or Click to Upload</h4>
+            <p style="color: var(--slate-400); font-size: 0.85rem;">Supports JPG, PNG images of diseased leaves or stems.</p>
+            <input type="file" id="disease-file-input" accept="image/*" style="display: none;">
+          </div>
+
+          <div id="disease-preview-container" style="margin-top: 1rem; display: none; text-align: center;">
+            <img id="disease-img-preview" style="max-height: 180px; border-radius: var(--radius-md); border: 1px solid var(--glass-border);">
+            <div style="margin-top: 0.5rem;">
+              <button class="btn-primary" id="btn-analyze-scanned-photo" style="margin: 0 auto;">
+                <i data-lucide="scan"></i> Run AI Diagnosis
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-card">
+          <div class="card-header">
+            <div class="card-title">
+              <i data-lucide="clipboard-list"></i>
+              <h3>Clinical Symptom Wizard</h3>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Select Crop</label>
+            <select id="diag-crop-select">
+              <option value="paddy_rice">Paddy Rice</option>
+              <option value="wheat">Wheat</option>
+              <option value="cotton">Cotton</option>
+              <option value="tomato">Tomato</option>
+              <option value="potato">Potato</option>
+            </select>
+          </div>
+
+          <label style="font-size: 0.85rem; font-weight: 600; color: var(--slate-300);">Observed Symptoms:</label>
+          <div class="symptom-grid">
+            <label class="symptom-chip"><input type="checkbox" value="brown_spots"> Brown/Black Spots</label>
+            <label class="symptom-chip"><input type="checkbox" value="yellowing"> Yellowing Leaves</label>
+            <label class="symptom-chip"><input type="checkbox" value="white_powder"> White Powdery Growth</label>
+            <label class="symptom-chip"><input type="checkbox" value="spindle_spots"> Spindle Lesions / Rice Blast</label>
+            <label class="symptom-chip"><input type="checkbox" value="yellow_stripes"> Yellow Stripes / Rust</label>
+            <label class="symptom-chip"><input type="checkbox" value="leaf_curling"> Aphid / Leaf Curl</label>
+          </div>
+
+          <button class="btn-secondary" id="btn-run-symptom-diag" style="width: 100%; justify-content: center; margin-top: 1.25rem;">
+            <i data-lucide="stethoscope"></i> Diagnose Symptoms
+          </button>
+        </div>
+      </div>
+
+      <div id="disease-results-output" style="margin-top: 1.5rem;"></div>
+    </section>
+
+    <!-- TAB 7: AI CHAT ASSISTANT VIEW -->
+    <section class="tab-content" id="tab-chat" style="display: none;">
+      <div class="glass-card" style="padding: 0;">
+        <div class="chat-container">
+          <div class="chat-messages" id="chat-messages-box">
+            <div class="chat-bubble ai">
+              🙏 <strong>Namaste! I am your AI Krishi Advisor.</strong><br>
+              I am synchronized with your farm profile (<strong>Kisan Vikas Agro Farm</strong>). Ask me any question about crops, live Indian weather, Neem Urea / DAP doses, or pest control!
+            </div>
+          </div>
+
+          <div class="quick-prompts">
+            <div class="prompt-chip" data-prompt="🌱 Recommend best crop for my current soil test">🌱 Best Crop Match</div>
+            <div class="prompt-chip" data-prompt="🧪 How much Neem Urea & DAP do I need for my field?">🧪 Fertilizer Dosage</div>
+            <div class="prompt-chip" data-prompt="💧 What is my irrigation schedule for today?">💧 Water Schedule</div>
+            <div class="prompt-chip" data-prompt="🍂 How to prevent Rice Blast in Paddy?">🍂 Rice Blast Cure</div>
+            <div class="prompt-chip" data-prompt="🌦️ Show current live weather advisory for my farm">🌦️ Live Weather</div>
+          </div>
+
+          <div class="chat-input-bar">
+            <input type="text" id="chat-input-text" placeholder="Ask Krishi AI in English or Hinglish..." class="form-control">
+            <button class="btn-primary" id="btn-send-chat">
+              <i data-lucide="send"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FARM PROFILE MODAL -->
+  <div class="modal-backdrop" id="farm-profile-modal">
+    <div class="modal-content">
+      <div class="card-header" style="margin-bottom: 1.5rem;">
+        <div class="card-title">
+          <i data-lucide="sliders"></i>
+          <h3>Configure Farm & Soil Profile</h3>
+        </div>
+        <button class="btn-edit-profile" id="btn-close-modal">✕</button>
+      </div>
+
+      <form id="form-farm-profile">
+        <div class="form-group">
+          <label>Farm Name</label>
+          <input type="text" id="modal-farm-name" value="Kisan Vikas Agro Farm">
+        </div>
+
+        <div class="form-group">
+          <label>Location Name</label>
+          <input type="text" id="modal-location-name" value="Ludhiana, Punjab">
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+          <div class="form-group">
+            <label>Field Area</label>
+            <input type="number" id="modal-area" value="5" step="0.5">
+          </div>
+          <div class="form-group">
+            <label>Unit</label>
+            <select id="modal-unit">
+              <option value="acre">Acres</option>
+              <option value="bigha">Bigha</option>
+              <option value="guntha">Guntha</option>
+              <option value="hectare">Hectares</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem;">
+          <div class="form-group">
+            <label>Nitrogen (N)</label>
+            <input type="number" id="modal-n" value="95">
+          </div>
+          <div class="form-group">
+            <label>Phosphorus (P)</label>
+            <input type="number" id="modal-p" value="48">
+          </div>
+          <div class="form-group">
+            <label>Potassium (K)</label>
+            <input type="number" id="modal-k" value="58">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Soil pH</label>
+          <input type="number" id="modal-ph" value="6.8" step="0.1">
+        </div>
+
+        <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; margin-top: 1.5rem;">
+          Save Farm Profile & Sync AI
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
